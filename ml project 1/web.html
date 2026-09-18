@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en" id="html-tag">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VGU Lost and Found</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f3f4f6;
+            --text-color: #1f2937;
+            --card-bg: #ffffff;
+            --header-text: #111827;
+            --subtle-text: #4b5563;
+            --border-color: #e5e7eb;
+            --input-bg: #ffffff;
+            --ring-color: #6366f1;
+            --scrollbar-thumb: #888;
+            --scrollbar-thumb-hover: #555;
+            --scrollbar-track: #f1f1f1;
+            --lost-color: #ef4444;
+            --found-color: #22c55e;
+        }
+
+        html.dark {
+            --bg-color: #111827;
+            --text-color: #f9fafb;
+            --card-bg: #1f2937;
+            --header-text: #ffffff;
+            --subtle-text: #9ca3af;
+            --border-color: #374151;
+            --input-bg: #374151;
+            --ring-color: #818cf8;
+            --scrollbar-thumb: #555;
+            --scrollbar-thumb-hover: #888;
+            --scrollbar-track: #1f2937;
+            --lost-color: #f87171;
+            --found-color: #4ade80;
+        }
+
+        html.orange {
+            --bg-color: #fffaf0; /* Floral White */
+            --text-color: #4c2b11; /* Dark Brown */
+            --card-bg: #ffffff;
+            --header-text: #dd6b20; /* Dark Orange */
+            --subtle-text: #718096; /* Slate */
+            --border-color: #fed7aae0; /* Orange-100 */
+            --input-bg: #ffffff;
+            --ring-color: #f59e0b; /* Amber 500 */
+            --scrollbar-thumb: #fdb8a0;
+            --scrollbar-thumb-hover: #dd6b20;
+            --scrollbar-track: #fffaf0;
+            --lost-color: #dd6b20;
+            --found-color: #f59e0b;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .form-container {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .form-container.active {
+            max-height: 1000px; /* Adjust as needed */
+        }
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--scrollbar-track);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-thumb);
+            border-radius: 10px;
+            transition: background-color 0.3s ease;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--scrollbar-thumb-hover);
+        }
+        .btn-gradient-lost {
+            background-image: linear-gradient(to right, var(--lost-color), #ef4444);
+        }
+        .btn-gradient-found {
+            background-image: linear-gradient(to right, var(--found-color), #34d399);
+        }
+        html.orange .btn-gradient-lost {
+             background-image: linear-gradient(to right, #f97316, #ea580c);
+        }
+        html.orange .btn-gradient-found {
+             background-image: linear-gradient(to right, #f59e0b, #d97706);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl relative">
+        <!-- Theme Toggle Button -->
+        <button id="theme-toggle" class="absolute top-4 right-4 md:top-8 md:right-8 z-10 p-2 rounded-lg focus:outline-none focus:ring-2" style="color: var(--subtle-text); --tw-ring-color: var(--ring-color);">
+            <svg id="theme-icon-light" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+            <svg id="theme-icon-dark" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+            <svg id="theme-icon-orange" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2.252a9.75 9.75 0 017.93 14.54l-3.352-3.352a.75.75 0 00-1.06 1.06l3.351 3.352A9.75 9.75 0 1112 2.252zM19.07 16.93a.75.75 0 00-1.06-1.06l-1.06 1.06c-.32-.68-.7-1.32-1.13-1.92s-.9-1.14-1.42-1.66c-.52-.52-1.06-.9-1.66-1.42s-1.24-.81-1.92-1.13l1.06-1.06a.75.75 0 00-1.06-1.06l-1.06 1.06c-.68-.32-1.32-.7-1.92-1.13s-1.14-.9-1.66-1.42c-.52-.52-.9-1.06-1.42-1.66s-.81-1.24-1.13-1.92l1.06-1.06a.75.75 0 00-1.06-1.06l-1.06 1.06A9.753 9.753 0 0112 2.252v0z"></path></svg>
+        </button>
+
+        <!-- Header -->
+        <header class="flex flex-col md:flex-row justify-between items-center mb-8 p-6 bg-white rounded-xl shadow-lg" style="background-color: var(--card-bg);">
+            <div class="flex items-center space-x-4">
+                <img src="https://vgu.ac.in/wp-content/uploads/2023/12/vgu-logo-1.png" alt="VGU Logo" class="h-16 w-auto">
+                <div>
+                    <h1 class="text-2xl md:text-4xl font-bold" style="color: var(--header-text);">Lost & Found Portal</h1>
+                    <p class="text-sm md:text-md" style="color: var(--subtle-text);">Vivekananda Global University, Jaipur</p>
+                </div>
+            </div>
+            <div class="mt-4 md:mt-0 flex items-center space-x-4">
+                 <button id="reportLostBtn" class="btn-gradient-lost text-white font-bold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:scale-105">Report Lost Item</button>
+                 <button id="reportFoundBtn" class="btn-gradient-found text-white font-bold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:scale-105">Report Found Item</button>
+            </div>
+        </header>
+
+        <!-- Search Bar -->
+        <div class="mb-8">
+            <input type="text" id="searchInput" placeholder="Search by item, location, or contact..." class="w-full p-4 border rounded-xl focus:outline-none focus:ring-2 shadow-sm transition" style="background-color: var(--input-bg); color: var(--text-color); border-color: var(--border-color); --tw-ring-color: var(--ring-color);">
+        </div>
+
+        <!-- Report Item Form Container -->
+        <div id="formContainer" class="form-container mb-8">
+            <div id="formCard" class="bg-white p-6 rounded-xl shadow-lg" style="background-color: var(--card-bg);">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 id="formTitle" class="text-2xl font-bold" style="color: var(--header-text);">Report an Item</h2>
+                    <button id="closeFormBtn" class="text-gray-500 hover:text-gray-800 text-2xl" style="color: var(--subtle-text);">&times;</button>
+                </div>
+                <form id="reportItemForm">
+                    <input type="hidden" id="itemType" name="itemType">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="itemName" class="block mb-2 text-sm font-medium" style="color: var(--text-color);">Item Name/Description</label>
+                            <input type="text" id="itemName" name="itemName" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2" placeholder="e.g., Black Dell Laptop Bag" required style="background-color: var(--input-bg); color: var(--text-color); border-color: var(--border-color); --tw-ring-color: var(--ring-color);">
+                        </div>
+                        <div>
+                            <label for="location" class="block mb-2 text-sm font-medium" style="color: var(--text-color);">Last Seen / Found At</label>
+                            <input type="text" id="location" name="location" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2" placeholder="e.g., Library, Block-A" required style="background-color: var(--input-bg); color: var(--text-color); border-color: var(--border-color); --tw-ring-color: var(--ring-color);">
+                        </div>
+                        <div>
+                            <label for="date" class="block mb-2 text-sm font-medium" style="color: var(--text-color);">Date</label>
+                            <input type="date" id="date" name="date" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2" required style="background-color: var(--input-bg); color: var(--text-color); border-color: var(--border-color); --tw-ring-color: var(--ring-color);">
+                        </div>
+                        <div>
+                            <label for="contact" class="block mb-2 text-sm font-medium" style="color: var(--text-color);">Contact Information (Name & Phone/Email)</label>
+                            <input type="text" id="contact" name="contact" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2" placeholder="e.g., Rohan - 9876543210" required style="background-color: var(--input-bg); color: var(--text-color); border-color: var(--border-color); --tw-ring-color: var(--ring-color);">
+                        </div>
+                    </div>
+                    <button type="submit" id="submitBtn" class="w-full mt-6 text-white font-bold py-3 px-4 rounded-lg transition-transform transform hover:scale-105 shadow-md">Submit Report</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Lost Items Section -->
+            <section id="lost-items" class="bg-white p-6 rounded-xl shadow-lg" style="background-color: var(--card-bg);">
+                <h2 class="text-3xl font-bold mb-6 pb-2 border-b-2" style="color: var(--lost-color); border-color: var(--lost-color);">Lost Items</h2>
+                <div id="lostItemsList" class="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
+                     <p class="text-center py-8" style="color: var(--subtle-text);">No lost items reported yet. Be the first!</p>
+                </div>
+            </section>
+
+            <!-- Found Items Section -->
+            <section id="found-items" class="bg-white p-6 rounded-xl shadow-lg" style="background-color: var(--card-bg);">
+                <h2 class="text-3xl font-bold mb-6 pb-2 border-b-2" style="color: var(--found-color); border-color: var(--found-color);">Found Items</h2>
+                <div id="foundItemsList" class="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
+                    <p class="text-center py-8" style="color: var(--subtle-text);">No found items reported yet. Report one if you find something!</p>
+                </div>
+            </section>
+        </main>
+        
+        <!-- Footer -->
+        <footer class="text-center mt-12 text-sm" style="color: var(--subtle-text);">
+            <p>&copy; <span id="year"></span> Vivekananda Global University. All Rights Reserved.</p>
+            <p class="mt-1">Designed to help the VGU community.</p>
+        </footer>
+
+        <!-- Toast Notification -->
+        <div id="toast" class="fixed bottom-5 right-5 bg-gray-800 text-white py-2 px-4 rounded-lg shadow-lg opacity-0 transition-opacity duration-300" style="background-color: #333; color: #fff;">
+            <p id="toastMessage"></p>
+        </div>
+
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, query, onSnapshot, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- CONFIGURATION ---
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'vgu-lost-and-found';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // --- FIREBASE INITIALIZATION ---
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let userId = null;
+        let allItemsCache = []; // Cache for all items from Firestore
+
+        // --- DOM ELEMENTS ---
+        const reportLostBtn = document.getElementById('reportLostBtn');
+        const reportFoundBtn = document.getElementById('reportFoundBtn');
+        const closeFormBtn = document.getElementById('closeFormBtn');
+        const formContainer = document.getElementById('formContainer');
+        const formCard = document.getElementById('formCard');
+        const formTitle = document.getElementById('formTitle');
+        const reportItemForm = document.getElementById('reportItemForm');
+        const itemTypeInput = document.getElementById('itemType');
+        const submitBtn = document.getElementById('submitBtn');
+        const lostItemsList = document.getElementById('lostItemsList');
+        const foundItemsList = document.getElementById('foundItemsList');
+        const searchInput = document.getElementById('searchInput');
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toastMessage');
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeIconLight = document.getElementById('theme-icon-light');
+        const themeIconDark = document.getElementById('theme-icon-dark');
+        const themeIconOrange = document.getElementById('theme-icon-orange');
+        const htmlTag = document.getElementById('html-tag');
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+
+        // --- THEME MANAGEMENT ---
+        const themes = ['light', 'dark', 'orange'];
+        let currentThemeIndex = 0;
+
+        const applyTheme = (theme) => {
+            htmlTag.className = '';
+            htmlTag.classList.add(theme);
+
+            themeIconLight.classList.toggle('hidden', theme !== 'light');
+            themeIconDark.classList.toggle('hidden', theme !== 'dark');
+            themeIconOrange.classList.toggle('hidden', theme !== 'orange');
+            
+            localStorage.setItem('theme', theme);
+        };
+
+        themeToggleBtn.addEventListener('click', () => {
+            currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+            const newTheme = themes[currentThemeIndex];
+            applyTheme(newTheme);
+        });
+        
+        // --- UI FUNCTIONS ---
+
+        const showToast = (message) => {
+            toastMessage.textContent = message;
+            toast.classList.remove('opacity-0');
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+            }, 3000);
+        };
+
+        const openForm = (type) => {
+            reportItemForm.reset();
+            itemTypeInput.value = type;
+            formCard.style.borderColor = `var(--${type}-color)`;
+            submitBtn.className = `w-full mt-6 text-white font-bold py-3 px-4 rounded-lg transition-transform transform hover:scale-105 shadow-md btn-gradient-${type}`;
+
+            if (type === 'lost') {
+                formTitle.textContent = 'Report a Lost Item';
+                submitBtn.textContent = 'Submit Lost Report';
+            } else {
+                formTitle.textContent = 'Report a Found Item';
+                submitBtn.textContent = 'Submit Found Report';
+            }
+            formContainer.classList.add('active');
+        };
+
+        const closeForm = () => {
+            formContainer.classList.remove('active');
+        };
+        
+        const createItemCard = (item) => {
+            const card = document.createElement('div');
+            const isLost = item.type === 'lost';
+            const itemColorVar = isLost ? 'var(--lost-color)' : 'var(--found-color)';
+            
+            card.className = 'p-4 rounded-lg shadow-md border-l-4 transition-shadow hover:shadow-xl';
+            card.style.borderColor = itemColorVar;
+            card.style.backgroundColor = 'var(--card-bg)';
+            
+            const date = item.date ? new Date(item.date + 'T00:00:00').toLocaleDateString() : 'N/A';
+
+            card.innerHTML = `
+                <h3 class="font-bold text-lg" style="color: var(--header-text);">${item.description}</h3>
+                <p class="text-sm mt-1" style="color: var(--subtle-text);"><span class="font-semibold" style="color: var(--text-color);">Location:</span> ${item.location}</p>
+                <p class="text-sm" style="color: var(--subtle-text);"><span class="font-semibold" style="color: var(--text-color);">Date:</span> ${date}</p>
+                <p class="text-sm mt-2" style="color: var(--subtle-text);"><span class="font-semibold" style="color: var(--text-color);">Contact:</span> ${item.contact}</p>
+                 <p class="text-xs text-right mt-2" style="color: var(--subtle-text); opacity: 0.7;">${item.timestamp ? new Date(item.timestamp.toDate()).toLocaleString() : ''}</p>
+            `;
+            return card;
+        };
+
+        const renderItems = (items, listElement) => {
+            listElement.innerHTML = '';
+            if (items.length === 0) {
+                 const type = listElement.id.includes('lost') ? 'lost' : 'found';
+                 const searchTerm = searchInput.value;
+                 if (searchTerm) {
+                    listElement.innerHTML = `<p class="text-center py-8" style="color: var(--subtle-text);">No ${type} items match your search for "${searchTerm}".</p>`;
+                 } else {
+                    listElement.innerHTML = `<p class="text-center py-8" style="color: var(--subtle-text);">No ${type} items reported yet.</p>`;
+                 }
+                 return;
+            }
+            items.forEach(item => {
+                const card = createItemCard(item);
+                listElement.appendChild(card);
+            });
+        };
+        
+        const filterAndRenderAll = () => {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+
+            const filteredItems = allItemsCache.filter(item => 
+                (item.description && item.description.toLowerCase().includes(searchTerm)) ||
+                (item.location && item.location.toLowerCase().includes(searchTerm)) ||
+                (item.contact && item.contact.toLowerCase().includes(searchTerm))
+            );
+            
+            const lostItems = filteredItems.filter(item => item.type === 'lost').sort((a, b) => b.timestamp - a.timestamp);
+            const foundItems = filteredItems.filter(item => item.type === 'found').sort((a, b) => b.timestamp - a.timestamp);
+            
+            renderItems(lostItems, lostItemsList);
+            renderItems(foundItems, foundItemsList);
+        };
+
+
+        // --- EVENT LISTENERS ---
+        reportLostBtn.addEventListener('click', () => openForm('lost'));
+        reportFoundBtn.addEventListener('click', () => openForm('found'));
+        closeFormBtn.addEventListener('click', closeForm);
+        searchInput.addEventListener('input', filterAndRenderAll);
+        
+        reportItemForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if(!userId) {
+                showToast("Error: You must be logged in to report an item.");
+                console.error("User not authenticated");
+                return;
+            }
+
+            const formData = new FormData(reportItemForm);
+            const itemData = {
+                type: formData.get('itemType'),
+                description: formData.get('itemName'),
+                location: formData.get('location'),
+                date: formData.get('date'),
+                contact: formData.get('contact'),
+                timestamp: serverTimestamp(),
+                reporterId: userId
+            };
+
+            try {
+                const collectionPath = `artifacts/${appId}/public/data/items`;
+                await addDoc(collection(db, collectionPath), itemData);
+                showToast(`Successfully reported ${itemData.type} item!`);
+                closeForm();
+            } catch (error) {
+                console.error("Error adding document: ", error);
+                showToast("Error: Could not submit report.");
+            }
+        });
+
+        // --- FIREBASE AUTH & DATA FETCHING ---
+        const initialize = async () => {
+             // Set initial theme
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (savedTheme && themes.includes(savedTheme)) {
+                currentThemeIndex = themes.indexOf(savedTheme);
+            } else if (prefersDark) {
+                currentThemeIndex = themes.indexOf('dark');
+            }
+            applyTheme(themes[currentThemeIndex]);
+
+
+             onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    userId = user.uid;
+                    console.log("User is signed in with UID:", userId);
+                    subscribeToItems();
+                } else {
+                    userId = null;
+                    console.log("User is signed out.");
+                }
+            });
+
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch(error) {
+                 console.error("Anonymous sign-in failed:", error);
+                 showToast("Authentication failed. You won't be able to post items.");
+            }
+        };
+
+        const subscribeToItems = () => {
+             const collectionPath = `artifacts/${appId}/public/data/items`;
+             const q = query(collection(db, collectionPath));
+             
+             onSnapshot(q, (querySnapshot) => {
+                 allItemsCache = [];
+                 querySnapshot.forEach((doc) => {
+                     allItemsCache.push({ id: doc.id, ...doc.data() });
+                 });
+                 filterAndRenderAll();
+             }, (error) => {
+                 console.error("Error fetching items in real-time:", error);
+                 showToast("Error: Could not load items.");
+             });
+        };
+
+        // --- START THE APP ---
+        initialize();
+
+    </script>
+</body>
+</html>
